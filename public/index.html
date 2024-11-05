@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GitHub README Viewer</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>GitHub Profile README Viewer</h1>
+    <form id="usernameForm">
+      <input type="text" id="username" placeholder="Enter GitHub username" required />
+      <button type="submit">Fetch README</button>
+    </form>
+    <div id="readmeContainer"></div>
+  </div>
+
+  <script>
+    document.getElementById('usernameForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const readmeContainer = document.getElementById('readmeContainer');
+      
+      if (!username) {
+        readmeContainer.innerHTML = '<p class="error">Please enter a valid username.</p>';
+        return;
+      }
+      
+      readmeContainer.innerHTML = '<p>Loading...</p>';
+      
+      try {
+        const response = await fetch(`/api/readme?username=${encodeURIComponent(username)}`);
+        const data = await response.json();
+
+        if (response.ok && data.content) {
+          readmeContainer.innerHTML = data.content;
+        } else {
+          readmeContainer.innerHTML = `<p class="error">${data.error || 'An error occurred while fetching the README.'}</p>`;
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        readmeContainer.innerHTML = '<p class="error">Error fetching README. Please try again later.</p>';
+      }
+    });
+  </script>
+</body>
+</html>
